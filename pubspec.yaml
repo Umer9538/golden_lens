@@ -3,7 +3,7 @@ description: >-
   Agent-grade golden tests for Flutter: attribute visual diffs to the exact
   widget and source line, score perceptual parity, and emit agent-readable
   reports.
-version: 0.1.0
+version: 0.1.1
 repository: https://github.com/Umer9538/golden_lens
 issue_tracker: https://github.com/Umer9538/golden_lens/issues
 
@@ -12,6 +12,12 @@ topics:
   - golden
   - visual-regression
   - ai
+
+screenshots:
+  - description: >-
+      golden_lens highlights the changed region and names the offending
+      widget + source line.
+    path: doc/diff.png
 
 environment:
   sdk: ">=3.5.0 <4.0.0"

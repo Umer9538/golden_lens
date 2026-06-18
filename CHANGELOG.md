@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+- Add README before/after/diff screenshots and a pub.dev screenshot, generated
+  from a real run of the pipeline (`test/tool/generate_doc_images.dart`).
+
 ## 0.1.0
 
 Initial release.

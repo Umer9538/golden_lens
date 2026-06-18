@@ -31,6 +31,14 @@ When a golden fails, `flutter test` tells you *"pixels changed"*. It doesn't tel
 
 > **I gave the agent eyes that can count pixels and read line numbers.**
 
+## See it
+
+| Golden (baseline) | New (price recolored) | golden_lens diff |
+| :---: | :---: | :---: |
+| ![golden](doc/golden.png) | ![new](doc/new.png) | ![diff](doc/diff.png) |
+
+*Only the price color changed. golden_lens highlights exactly the changed region, boxes the offending widgets, and names each one's source line — overall parity 99.4%. (These are real Flutter golden renders; the blocky glyphs are the default test font.)*
+
 golden_lens is the **layer above** [`alchemist`](https://pub.dev/packages/alchemist) and the built-in `matchesGoldenFile` — not a replacement. Install it once and *every* existing golden test (including your alchemist suite) gains attribution, with **zero test changes**.
 
 ---
