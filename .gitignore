@@ -1,0 +1,12 @@
+.dart_tool/
+.packages
+build/
+pubspec.lock
+*.iml
+.idea/
+
+# golden_lens report output written during failing golden tests
+**/golden_lens/*.report.json
+**/golden_lens/*.report.html
+# flutter_test failure artifacts
+**/failures/

@@ -1,0 +1,21 @@
+name: golden_lens_example
+description: Example app and golden tests demonstrating golden_lens.
+publish_to: none
+version: 1.0.0
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.16.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  golden_lens:
+    path: ../
+
+flutter:
+  uses-material-design: true
