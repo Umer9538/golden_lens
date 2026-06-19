@@ -12,6 +12,7 @@ class AttributedNode {
     required this.depth,
     required this.rawLocation,
     required this.resolvedLocation,
+    this.paintOrder = 0,
   });
 
   /// The render object's runtime type, e.g. `RenderConstrainedBox`.
@@ -22,6 +23,10 @@ class AttributedNode {
 
   /// Depth in the render tree (root = 0). Deeper = more specific.
   final int depth;
+
+  /// Paint order (pre-order traversal index). Higher = painted later = on top.
+  /// Used to disambiguate overlapping same-size widgets.
+  final int paintOrder;
 
   /// The creation site of the widget that *directly* owns this render object —
   /// which may live inside the framework (e.g. a `ColoredBox` created inside
@@ -94,6 +99,7 @@ bool isLocalProjectFile(String file) {
 /// depth-first paint order, annotated with global bounds and source location.
 List<AttributedNode> captureAttributedTree(RenderObject root) {
   final List<AttributedNode> nodes = <AttributedNode>[];
+  int order = 0;
 
   void visit(RenderObject ro, int depth) {
     final Rect? bounds = globalBoundsOf(ro);
@@ -113,6 +119,7 @@ List<AttributedNode> captureAttributedTree(RenderObject root) {
           depth: depth,
           rawLocation: raw,
           resolvedLocation: resolved,
+          paintOrder: order++,
         ),
       );
     }
@@ -138,10 +145,11 @@ Rect? globalBoundsOf(RenderObject ro) {
 /// Hit-tests a changed-pixel [region] against captured [nodes] and returns the
 /// innermost owning node.
 ///
-/// Strategy (v0.1): among nodes whose bounds contain the region's centre, prefer
-/// nodes that fully contain the region, then pick the smallest area (tightest
-/// fit), breaking ties by greatest depth. When [preferLocalProject] is true,
-/// nodes resolvable to user code win over framework-only nodes.
+/// Strategy: among nodes whose bounds contain the region's centre, prefer nodes
+/// that fully contain the region, then pick the smallest area (tightest fit),
+/// breaking ties by paint order (topmost / later-painted wins) and then depth.
+/// When [preferLocalProject] is true, nodes resolvable to user code win over
+/// framework-only nodes.
 AttributedNode? attributeRegion(
   Rect region,
   List<AttributedNode> nodes, {
@@ -166,6 +174,8 @@ AttributedNode? attributeRegion(
   pool.sort((AttributedNode a, AttributedNode b) {
     final int byArea = a.area.compareTo(b.area);
     if (byArea != 0) return byArea;
+    final int byPaint = b.paintOrder.compareTo(a.paintOrder); // topmost first
+    if (byPaint != 0) return byPaint;
     return b.depth.compareTo(a.depth);
   });
 

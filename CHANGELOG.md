@@ -1,12 +1,14 @@
 # Changelog
 
-## 0.1.1
+## 0.2.0
 
-- HTML report now includes a highlighted **Diff** panel (changed regions tinted
-  + offenders boxed) alongside the golden/new images, via the shared
-  `renderDiffPng`.
-- Add README before/after/diff screenshots and a pub.dev screenshot, generated
-  from a real run of the pipeline (`test/tool/generate_doc_images.dart`).
+- Z-order-aware attribution: overlapping same-size widgets now attribute to the
+  topmost (latest-painted) one.
+- HTML report adds numbered offender overlays on the "New" image, plus a
+  highlighted **Diff** panel (changed regions tinted + offenders boxed) via the
+  shared `renderDiffPng`.
+- Report JSON now includes `candidate.devicePixelRatio`.
+- README + pub.dev screenshots generated from a real pipeline run.
 
 ## 0.1.0
 

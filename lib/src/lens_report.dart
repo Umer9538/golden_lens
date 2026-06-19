@@ -113,6 +113,7 @@ class LensReport {
     required this.offenders,
     required this.candidateSize,
     required this.goldenSize,
+    this.devicePixelRatio = 1.0,
   });
 
   final GoldenStatus status;
@@ -122,6 +123,9 @@ class LensReport {
   final List<Offender> offenders;
   final Size candidateSize;
   final Size goldenSize;
+
+  /// Device pixel ratio the images were captured at (physical = logical × dpr).
+  final double devicePixelRatio;
 
   /// Deterministic JSON (schema v1.0). Timestamps / report paths are added by
   /// the writer, not here, so this stays test-stable.
@@ -134,7 +138,10 @@ class LensReport {
           'path': goldenPath,
           'size': _sizeJson(goldenSize),
         },
-        'candidate': <String, Object?>{'size': _sizeJson(candidateSize)},
+        'candidate': <String, Object?>{
+          'size': _sizeJson(candidateSize),
+          'devicePixelRatio': devicePixelRatio,
+        },
         'parity': parity.toJson(),
         'offenders': <Object?>[for (final Offender o in offenders) o.toJson()],
       };

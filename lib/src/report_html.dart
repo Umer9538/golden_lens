@@ -10,10 +10,15 @@ h1 { font-size: 20px; margin: 0 0 4px; }
 .images figure { margin: 0; }
 .images img { max-width: 320px; border: 1px solid #ccc; image-rendering: pixelated; }
 .images figcaption { font-size: 12px; color: #888; text-align: center; }
-ol.offenders { padding-left: 20px; }
+ol.offenders { padding-left: 24px; }
 ol.offenders li { margin: 6px 0; }
 code { background: rgba(127,127,127,0.18); padding: 1px 5px; border-radius: 4px; }
 .suggestion { color: #888; font-size: 13px; }
+.canvas { position: relative; display: inline-block; line-height: 0; }
+.canvas img { display: block; }
+.ov { position: absolute; border: 2px solid #FFC400; box-sizing: border-box; }
+.ov span { position: absolute; top: -1px; left: -1px; background: #FFC400;
+  color: #000; font: 700 11px/1.5 sans-serif; padding: 0 5px; }
 ''';
 
 /// Renders a self-contained HTML report (no JS, no external assets).
@@ -41,7 +46,7 @@ String encodeReportHtml(
       diffPngBase64 != null) {
     b.writeln('<div class="images">');
     _figure(b, 'Golden', goldenPngBase64);
-    _figure(b, 'New', candidatePngBase64);
+    _newFigure(b, candidatePngBase64, report);
     _figure(b, 'Diff', diffPngBase64);
     b.writeln('</div>');
   }
@@ -74,6 +79,31 @@ void _figure(StringBuffer b, String caption, String? base64Png) {
   b.writeln('<figure><img alt="$caption" '
       'src="data:image/png;base64,$base64Png">'
       '<figcaption>$caption</figcaption></figure>');
+}
+
+/// The "New" panel with numbered offender boxes overlaid (CSS-positioned as
+/// percentages so they scale with the displayed image).
+void _newFigure(StringBuffer b, String? base64Png, LensReport report) {
+  if (base64Png == null) return;
+  final double w = report.candidateSize.width;
+  final double h = report.candidateSize.height;
+  final double dpr = report.devicePixelRatio;
+  b.writeln('<figure><div class="canvas">'
+      '<img alt="New" src="data:image/png;base64,$base64Png">');
+  if (w > 0 && h > 0) {
+    int rank = 0;
+    for (final Offender o in report.offenders) {
+      rank++;
+      final double l = o.region.left * dpr / w * 100;
+      final double t = o.region.top * dpr / h * 100;
+      final double bw = o.region.width * dpr / w * 100;
+      final double bh = o.region.height * dpr / h * 100;
+      b.writeln('<div class="ov" style="left:${l.toStringAsFixed(2)}%;'
+          'top:${t.toStringAsFixed(2)}%;width:${bw.toStringAsFixed(2)}%;'
+          'height:${bh.toStringAsFixed(2)}%"><span>$rank</span></div>');
+    }
+  }
+  b.writeln('</div><figcaption>New</figcaption></figure>');
 }
 
 String _esc(String s) => s

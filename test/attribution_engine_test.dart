@@ -77,6 +77,53 @@ void main() {
     );
   });
 
+  testWidgets('overlapping same-size widgets attribute to the topmost',
+      (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              key: Key('stack'),
+              width: 100,
+              height: 100,
+              child: Stack(
+                children: <Widget>[
+                  Positioned.fill(child: ColoredBox(color: Color(0xFF0000FF))),
+                  Positioned.fill(child: ColoredBox(color: Color(0xFF00FF00))),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final RenderObject root =
+        tester.element(find.byType(MaterialApp)).renderObject!;
+    final nodes = captureAttributedTree(root);
+    final center = tester.getRect(find.byKey(const Key('stack'))).center;
+
+    final candidates = nodes
+        .where((n) =>
+            n.isLocalProject &&
+            n.globalBounds.contains(center) &&
+            (n.globalBounds.width - 100).abs() < 1 &&
+            (n.globalBounds.height - 100).abs() < 1)
+        .toList();
+    expect(candidates.length, greaterThanOrEqualTo(2));
+    final maxPaint =
+        candidates.map((n) => n.paintOrder).reduce((a, b) => a > b ? a : b);
+
+    final hit = attributeRegion(
+      Rect.fromCenter(center: center, width: 2, height: 2),
+      nodes,
+    );
+    expect(hit, isNotNull);
+    expect(hit!.paintOrder, maxPaint,
+        reason: 'topmost (latest-painted) overlapping widget should win');
+  });
+
   test('isLocalProjectFile distinguishes user code from SDK/pub', () {
     expect(isLocalProjectFile('/Users/me/app/lib/card.dart'), isTrue);
     expect(

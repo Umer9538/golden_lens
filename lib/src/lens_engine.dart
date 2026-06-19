@@ -38,6 +38,7 @@ LensReport analyzeBuffers({
       offenders: const <Offender>[],
       candidateSize: diff.newerSize,
       goldenSize: diff.goldenSize,
+      devicePixelRatio: candidate.devicePixelRatio,
     );
   }
 
@@ -54,6 +55,7 @@ LensReport analyzeBuffers({
       offenders: const <Offender>[],
       candidateSize: diff.newerSize,
       goldenSize: diff.goldenSize,
+      devicePixelRatio: candidate.devicePixelRatio,
     );
   }
 
@@ -102,6 +104,7 @@ LensReport analyzeBuffers({
     offenders: offenders,
     candidateSize: diff.newerSize,
     goldenSize: diff.goldenSize,
+    devicePixelRatio: candidate.devicePixelRatio,
   );
 }
 

@@ -58,6 +58,10 @@ void main() {
     final region = o['region']! as Map<String, Object?>;
     expect(region['width'], 30);
     expect((o['delta']! as Map)['kind'], 'unknown');
+
+    final candidate = map['candidate']! as Map<String, Object?>;
+    expect((candidate['size']! as Map)['width'], 400);
+    expect(candidate['devicePixelRatio'], 1.0);
   });
 
   test('JSON writer can add non-deterministic extras', () {
@@ -91,5 +95,10 @@ void main() {
     expect(html, contains('data:image/png;base64,AAAA'));
     expect(html, contains('data:image/png;base64,BBBB'));
     expect(html, contains('data:image/png;base64,CCCC'));
+
+    // The New panel overlays a numbered box for the offender.
+    expect(html, contains('class="canvas"'));
+    expect(html, contains('class="ov"'));
+    expect(html, contains('<span>1</span>'));
   });
 }
