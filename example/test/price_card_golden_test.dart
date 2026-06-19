@@ -13,7 +13,10 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      const MaterialApp(home: Scaffold(body: Center(child: PriceCard()))),
+      const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(body: Center(child: PriceCard())),
+      ),
     );
     await expectLater(
       find.byType(MaterialApp),

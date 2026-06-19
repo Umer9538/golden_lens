@@ -6,8 +6,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'attribution_engine.dart';
+import 'diff_image.dart';
 import 'golden_lens_config.dart';
 import 'image_capture.dart';
+import 'image_diff.dart';
 import 'lens_engine.dart';
 import 'lens_report.dart';
 import 'report_writer.dart';
@@ -105,12 +107,22 @@ class LensGoldenComparator extends LocalFileComparator {
       config: config,
     );
 
+    // Build the highlighted diff panel for the HTML report.
+    String? diffPngBase64;
+    if (report.offenders.isNotEmpty) {
+      final ChangedMask mask =
+          diffBuffers(candidate, goldenBuffer, config.diffOptions).mask;
+      diffPngBase64 =
+          base64Encode(await renderDiffPng(candidate, mask, report.offenders));
+    }
+
     writeReports(
       report,
       config: config,
       outputDir: Directory.fromUri(basedir.resolve('${config.outputDir}/')),
       goldenPngBase64: base64Encode(goldenBytes),
       candidatePngBase64: base64Encode(candidateBytes),
+      diffPngBase64: diffPngBase64,
     );
   }
 

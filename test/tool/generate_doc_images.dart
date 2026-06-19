@@ -4,7 +4,6 @@
 //
 // Writes doc/golden.png, doc/new.png, doc/diff.png. Not a unit test (no
 // `_test.dart` suffix) so it is skipped by the normal suite.
-import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -38,17 +37,6 @@ class _PriceCard extends StatelessWidget {
 
 Future<Uint8List> _boundaryPng(RenderRepaintBoundary b, double dpr) async {
   final ui.Image img = await b.toImage(pixelRatio: dpr);
-  final Uint8List png = (await img.toByteData(format: ui.ImageByteFormat.png))!
-      .buffer
-      .asUint8List();
-  img.dispose();
-  return png;
-}
-
-Future<Uint8List> _rgbaToPng(Uint8List rgba, int w, int h) async {
-  final Completer<ui.Image> c = Completer<ui.Image>();
-  ui.decodeImageFromPixels(rgba, w, h, ui.PixelFormat.rgba8888, c.complete);
-  final ui.Image img = await c.future;
   final Uint8List png = (await img.toByteData(format: ui.ImageByteFormat.png))!
       .buffer
       .asUint8List();
@@ -106,47 +94,10 @@ void main() {
       config: const GoldenLensConfig(diffOptions: opts),
     );
 
-    // Build the diff visualization: tint changed pixels red, outline offenders.
-    final int w = candidateBuf.width;
-    final int h = candidateBuf.height;
-    final Uint8List out = Uint8List.fromList(candidateBuf.rgba);
-    for (int i = 0; i < w * h; i++) {
-      if (diff.mask.bits[i] != 0) {
-        out[i * 4] = (out[i * 4] * 0.35 + 255 * 0.65).round();
-        out[i * 4 + 1] = (out[i * 4 + 1] * 0.35).round();
-        out[i * 4 + 2] = (out[i * 4 + 2] * 0.35).round();
-        out[i * 4 + 3] = 255;
-      }
-    }
-    void px(int x, int y) {
-      if (x < 0 || y < 0 || x >= w || y >= h) return;
-      final int i = (y * w + x) * 4;
-      out[i] = 255;
-      out[i + 1] = 235;
-      out[i + 2] = 59;
-      out[i + 3] = 255;
-    }
-
-    for (final Offender o in report.offenders) {
-      final int l = o.region.left.round();
-      final int t = o.region.top.round();
-      final int r = o.region.right.round();
-      final int b = o.region.bottom.round();
-      for (int d = 0; d < 2; d++) {
-        for (int x = l; x < r; x++) {
-          px(x, t + d);
-          px(x, b - 1 - d);
-        }
-        for (int y = t; y < b; y++) {
-          px(l + d, y);
-          px(r - 1 - d, y);
-        }
-      }
-    }
-
+    // Build the diff visualization with the same renderer the package uses.
     late Uint8List diffPng;
     await tester.runAsync(() async {
-      diffPng = await _rgbaToPng(out, w, h);
+      diffPng = await renderDiffPng(candidateBuf, diff.mask, report.offenders);
     });
 
     final Directory dir = Directory('doc');

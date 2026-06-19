@@ -15,6 +15,7 @@ export 'src/attribution_engine.dart'
         locationForElement;
 export 'src/clustering.dart' show DiffCluster, clusterMask;
 export 'src/comparator.dart' show LensGoldenComparator, installGoldenLens;
+export 'src/diff_image.dart' show renderDiffPng;
 export 'src/golden_lens_config.dart'
     show GoldenLensConfig, ParityMetric, ReportFormat;
 export 'src/image_capture.dart' show capturePixelBuffer, loadGoldenPng;

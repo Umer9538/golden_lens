@@ -2,6 +2,9 @@
 
 ## 0.1.1
 
+- HTML report now includes a highlighted **Diff** panel (changed regions tinted
+  + offenders boxed) alongside the golden/new images, via the shared
+  `renderDiffPng`.
 - Add README before/after/diff screenshots and a pub.dev screenshot, generated
   from a real run of the pipeline (`test/tool/generate_doc_images.dart`).
 

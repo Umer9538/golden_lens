@@ -95,9 +95,13 @@ void main() {
     expect(
         loc['file']! as String, contains('comparator_integration_test.dart'));
 
-    // The human report is also written.
-    expect(
-        File('${tmp.path}/golden_lens/box.report.html').existsSync(), isTrue);
+    // The human report is also written, with golden + new + diff panels.
+    final htmlFile = File('${tmp.path}/golden_lens/box.report.html');
+    expect(htmlFile.existsSync(), isTrue);
+    final html = htmlFile.readAsStringSync();
+    expect('data:image/png;base64,'.allMatches(html).length, 3,
+        reason: 'golden, new, and diff images should all be embedded');
+    expect(html, contains('>Diff<'));
   });
 
   testWidgets('comparator writes no report when goldens match', (tester) async {
